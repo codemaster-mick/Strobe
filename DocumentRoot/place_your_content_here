@@ -1,0 +1,2 @@
+This directory is the main folder for the Apache server.
+Place anything you want served in here and it will be automatically loaded.
