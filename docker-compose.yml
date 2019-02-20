@@ -2,7 +2,7 @@ version:                                '2'
 services:
     apache-php:
         image:                          php:7.2.1-apache
-        container_name:                 lampstack-apache
+        container_name:                 strobe-apache
         ports:
             - 80:80
         restart:                        always
@@ -12,7 +12,7 @@ services:
             - 'mariadb'
     mariadb:
         image:                          mariadb:10.1
-        container_name:                 lampstack-mariadb
+        container_name:                 strobe-mariadb
         volumes:
             - mariadb:/var/lib/mysql
         environment:
@@ -25,7 +25,7 @@ services:
         restart:                        always
     phpmyadmin:
         image:                          phpmyadmin/phpmyadmin
-        container_name:                 lampstack-phpmyadmin
+        container_name:                 strobe-phpmyadmin
         environment:
             - PMA_ARBITRARY=1
         restart:                        always
