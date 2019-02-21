@@ -2,38 +2,64 @@ version:                                '2'
 services:
     apache-php:
         image:                          php:7.2.1-apache
-        container_name:                 strobe-apache
+        container_name:                 ${project_name}-apache
         ports:
-            - 80:80
+            - ${apache_port}:80
         restart:                        always
         volumes:
-            - ./DocumentRoot:/var/www/html
+            - ${apache_root}:/var/www/html
+        networks:
+            - frontend
+            - backend
         links:
             - 'mariadb'
     mariadb:
         image:                          mariadb:10.1
-        container_name:                 strobe-mariadb
+        container_name:                 ${project_name}-mariadb
         volumes:
             - mariadb:/var/lib/mysql
         environment:
-            TZ:                         "Eastern/Toronto"
+            TZ:                         "${timezone}"
             MYSQL_ALLOW_EMPTY_PASSWORD: "no"
-            MYSQL_ROOT_PASSWORD:        "HFqjTwMTroo="
-            MYSQL_USER:                 'devuser'
-            MYSQL_PASSWORD:             'password'
-            MYSQL_DATABASE:             'test'
+            MYSQL_ROOT_PASSWORD:        "${sql_root_pass}"
+            MYSQL_USER:                 "${mysql_user}"
+            MYSQL_PASSWORD:             "${mysql_password}"
+            MYSQL_DATABASE:             "${mysql_dbname}"
         restart:                        always
+        networks:
+            - backend
     phpmyadmin:
         image:                          phpmyadmin/phpmyadmin
-        container_name:                 strobe-phpmyadmin
+        container_name:                 ${project_name}-phpmyadmin
         environment:
             - PMA_ARBITRARY=1
+            - PMA_HOST=mariadb
+            - PMA_USER=${mysql_user}
+            - PMA_PASSWORD=${mysql_password}
         restart:                        always
         ports:
-            - 43102:80
+            - ${mysql_port}:80
         volumes:
           - /sessions
+        networks:
+            - frontend
+            - backend
         links:
             - 'mariadb'
 volumes:
     mariadb:
+networks:
+    frontend:
+        driver:                         bridge
+        ipam:
+            driver:                     default
+            config:
+            - subnet:                   "${frontend_subnet}"
+              gateway:                  "${frontend_gateway}"
+    backend:
+        driver:                         bridge
+        ipam:
+            driver:                     default
+            config:
+            - subnet:                   ${backend_subnet}
+              gateway:                  ${backend_gateway}
